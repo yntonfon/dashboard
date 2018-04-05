@@ -21,9 +21,10 @@ def create_app(config_object=None):
     from app.views import user_blueprint
     app.register_blueprint(user_blueprint, url_prefix=app.config['API_URL_PREFIX'])
     
-    # Register Bcrypt
-    from app.provider import bcrypt
+    # Register Extensions
+    from app.extension import bcrypt, mail
     bcrypt.init_app(app)
+    mail.init_app(app)
     
     # Register SQLAclchemy DB
     from app.model import db
