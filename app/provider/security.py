@@ -1,6 +1,6 @@
 from flask import current_app
 
-from . import bcrypt
+from app.extension import bcrypt
 
 
 class Security:
