@@ -5,7 +5,7 @@ from itsdangerous import URLSafeTimedSerializer
 from app.extension import bcrypt as bcrypt_instance
 
 
-class Salt(Enum):
+class SaltEnum(Enum):
     email_confirmation = 'email-confirmation-salt'
 
 
