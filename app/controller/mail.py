@@ -14,7 +14,7 @@ class MailController:
         self.url_provider = url_provider
         self.security_provider = security_provider
     
-    def send_confirmation_email_link(self, email):
+    def send_confirmation_email(self, email):
         token = self.security_provider.encrypt_to_urlsafetimed(email, salt=Salt.email_confirmation.value)
         url = self.url_provider.build_url_from(USER_CONFIRM_EMAIL_API, external=True, token=token)
         body = self.template_provider.render_template(EMAIL_ACTIVATE_TEMPLATE, confirm_url=url)

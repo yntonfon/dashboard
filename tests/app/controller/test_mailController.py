@@ -19,36 +19,36 @@ class TestMailController(TestCase):
                                          self.template_provider,
                                          self.mail_provider)
     
-    def test_send_confirmation_email_link_generates_safe_token_from_the_given_email(self):
+    def test_send_confirmation_email_generates_safe_token_from_the_given_email(self):
         # When
-        self.controller.send_confirmation_email_link(self.email)
+        self.controller.send_confirmation_email(self.email)
         
         # Then
         self.security_provider.encrypt_to_urlsafetimed.assert_called_with(self.email, salt='email-confirmation-salt')
     
-    def test_send_confirmation_email_link_generates_confirmation_url_with_the_token(self):
+    def test_send_confirmation_email_generates_confirmation_url_with_the_token(self):
         # Given
         token = 'nicetoken'
         self.security_provider.encrypt_to_urlsafetimed.return_value = token
         
         # When
-        self.controller.send_confirmation_email_link(self.email)
+        self.controller.send_confirmation_email(self.email)
         
         # Then
         self.url_provider.build_url_from.assert_called_with('user.user_confirm', external=True, token=token)
     
-    def test_send_confirmation_email_link_generates_email_template_containing_url(self):
+    def test_send_confirmation_email_generates_email_template_containing_url(self):
         # Given
         url = 'niceurl'
         self.url_provider.build_url_from.return_value = url
         
         # When
-        self.controller.send_confirmation_email_link(self.email)
+        self.controller.send_confirmation_email(self.email)
         
         # Then
         self.template_provider.render_template.assert_called_with('email/activate.html', confirm_url=url)
     
-    def test_send_confirmation_email_link_sends_email_with_template_to_the_given_address(self):
+    def test_send_confirmation_email_sends_email_with_template_to_the_given_address(self):
         # Given
         email_content = 'emailcontent'
         self.template_provider.render_template.return_value = email_content
@@ -60,7 +60,7 @@ class TestMailController(TestCase):
         )
         
         # When
-        self.controller.send_confirmation_email_link(self.email)
+        self.controller.send_confirmation_email(self.email)
         
         # Then
         self.mail_provider.send.assert_called_with(expected)
