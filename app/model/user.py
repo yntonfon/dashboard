@@ -1,9 +1,9 @@
-from app.model import db
+from app.extension import sqlalchemy
 
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(64), unique=True, index=True)
-    email = db.Column(db.String(120), unique=True, index=True)
-    password_hash = db.Column(db.String(128), nullable=False)
-    email_confirmed = db.Column(db.Boolean, default=False)
+class User(sqlalchemy.Model):
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    username = sqlalchemy.Column(sqlalchemy.String(64), unique=True, index=True)
+    email = sqlalchemy.Column(sqlalchemy.String(120), unique=True, index=True)
+    password_hash = sqlalchemy.Column(sqlalchemy.String(128), nullable=False)
+    email_confirmed = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
