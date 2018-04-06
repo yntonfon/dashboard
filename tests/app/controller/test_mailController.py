@@ -35,7 +35,9 @@ class TestMailController(TestCase):
         self.controller.send_confirmation_email_link(self.email)
         
         # Then
-        self.url_provider.build_url_from.assert_called_with('ConfirmationEmailAPI', external=True, token=token)
+        self.url_provider.build_url_from.assert_called_with(UrlProvider.USER_CONFIRM_EMAIL_API,
+                                                            external=True,
+                                                            token=token)
     
     def test_send_confirmation_email_link_generates_email_template_containing_url(self):
         # Given
