@@ -3,7 +3,7 @@ from flask import current_app
 from app.extension import bcrypt
 
 
-class Security:
+class SecurityProvider:
     def __init__(self, app, bcrypt):
         self.app = app
         self.bcrypt = bcrypt
@@ -12,4 +12,4 @@ class Security:
         return self.bcrypt.generate_password_hash(password, self.app.config['BCRYPT_LOG_ROUNDS'])
 
 
-security = Security(current_app, bcrypt)
+security_provider = SecurityProvider(current_app, bcrypt)
