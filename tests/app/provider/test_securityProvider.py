@@ -63,14 +63,15 @@ class TestSecurityProvider(TestCase):
         # Then
         self.mock_urlsafetimed_serializer.dumps.assert_called_with(data, salt=salt)
 
-    def test_decrypt_from_urlsafetimed_deserializes_token_to_data(self):
+    def test_decrypt_from_urlsafetimed_deserializes_token_to_original_data(self):
         # Given
         token = 'tokentodeserialize'
         salt = 'mysalt'
+        max_age = 12
         self.provider.urlsafetimed_serializer = self.mock_urlsafetimed_serializer
     
         # When
-        self.provider.decrypt_from_urlsafetimed(token, salt=salt)
+        self.provider.decrypt_from_urlsafetimed(token, salt=salt, max_age=max_age)
     
         # Then
-        self.mock_urlsafetimed_serializer.loads.assert_called_with(token, salt=salt)
+        self.mock_urlsafetimed_serializer.loads.assert_called_with(token, salt=salt, max_age=max_age)

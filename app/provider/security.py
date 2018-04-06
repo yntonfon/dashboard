@@ -26,8 +26,8 @@ class SecurityProvider:
     def encrypt_to_urlsafetimed(self, data, salt):
         return self.urlsafetimed_serializer.dumps(data, salt=salt)
 
-    def decrypt_from_urlsafetimed(self, token, salt):
-        return self.urlsafetimed_serializer.loads(token, salt=salt)
+    def decrypt_from_urlsafetimed(self, token, salt, max_age):
+        return self.urlsafetimed_serializer.loads(token, salt=salt, max_age=max_age)
 
 
 security_provider = SecurityProvider(bcrypt_instance, URLSafeTimedSerializer)
