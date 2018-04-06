@@ -1,4 +1,5 @@
-from app.model import User, db
+from app.extension import sqlalchemy
+from app.model import User
 
 
 class UserRepository:
@@ -8,8 +9,8 @@ class UserRepository:
     
     @staticmethod
     def save(user):
-        db.session.add(user)
-        db.session.commit()
+        sqlalchemy.session.add(user)
+        sqlalchemy.session.commit()
         return user.id
 
 
