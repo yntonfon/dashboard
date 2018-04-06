@@ -1,8 +1,12 @@
+from enum import Enum
+
 from itsdangerous import URLSafeTimedSerializer
 
 from app.extension import bcrypt as bcrypt_instance
 
-EMAIL_CONFIRMATION_SALT = 'email-confirmation-salt'
+
+class Salt(Enum):
+    email_confirmation = 'email-confirmation-salt'
 
 
 class SecurityProvider:
