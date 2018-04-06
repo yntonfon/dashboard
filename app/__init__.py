@@ -27,8 +27,5 @@ def create_app(config_object=None):
     mail.init_app(app)
     sqlalchemy.init_app(app)
     sqlalchemy.create_all(app=app)
-    
-    # Register Extensions without init_app()
-    from app.extension import url_safe_timed_serializer
 
     return app
