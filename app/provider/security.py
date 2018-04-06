@@ -19,7 +19,7 @@ class SecurityProvider:
     def encrypt_password(self, password):
         return self.bcrypt.generate_password_hash(password, self.app.config['BCRYPT_LOG_ROUNDS'])
 
-    def build_url_safe_timed(self, token, salt):
+    def encrypt_to_urlsafetimed(self, token, salt):
         return self.urlsafetimed_serializer.dumps(token, salt=salt)
         
 

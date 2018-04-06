@@ -52,14 +52,14 @@ class TestSecurityProvider(TestCase):
         # Then
         self.mock_bcrypt.generate_password_hash.assert_called_with(password, 12)
 
-    def test_build_url_safe_timed_generates_URL_safe_string_with_time_information(self):
+    def test_encrypt_to_urlsafetimed_generates_URL_safe_token_with_time_information(self):
         # Given
         data = 'datatosecure'
         salt = 'mysalt'
         self.provider.urlsafetimed_serializer = self.mock_urlsafetimed_serializer
         
         # When
-        self.provider.build_url_safe_timed(data, salt=salt)
+        self.provider.encrypt_to_urlsafetimed(data, salt=salt)
         
         # Then
         self.mock_urlsafetimed_serializer.dumps.assert_called_with(data, salt=salt)

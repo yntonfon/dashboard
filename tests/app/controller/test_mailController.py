@@ -24,12 +24,12 @@ class TestMailController(TestCase):
         self.controller.send_confirmation_email_link(self.email)
         
         # Then
-        self.security_provider.build_url_safe_timed.assert_called_with(self.email, salt='email-confirmation-link')
+        self.security_provider.encrypt_to_urlsafetimed.assert_called_with(self.email, salt='email-confirmation-link')
     
     def test_send_confirmation_email_link_generates_confirmation_url_with_the_token(self):
         # Given
         token = 'nicetoken'
-        self.security_provider.build_url_safe_timed.return_value = token
+        self.security_provider.encrypt_to_urlsafetimed.return_value = token
         
         # When
         self.controller.send_confirmation_email_link(self.email)
