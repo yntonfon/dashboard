@@ -5,6 +5,8 @@ from app.extension import bcrypt
 
 
 class SecurityProvider:
+    EMAIL_CONFIRMATION_LINK_KEY = 'email-confirmation-link'
+    
     def __init__(self, app, bcrypt, urlsafetimedserializer_cls):
         self.app = app
         self.bcrypt = bcrypt
@@ -13,7 +15,7 @@ class SecurityProvider:
     def encrypt_password(self, password):
         return self.bcrypt.generate_password_hash(password, self.app.config['BCRYPT_LOG_ROUNDS'])
 
-    def build_url_safe_timed_token(self, token, salt):
+    def build_url_safe_timed(self, token, salt):
         serializer = self.urlsafetimedserializer_cls(self.app.config['SECRET_KEY'])
         return serializer.dumps(token, salt=salt)
         
