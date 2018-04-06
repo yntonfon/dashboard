@@ -1,5 +1,4 @@
 from unittest import TestCase, mock
-from unittest.mock import Mock
 
 from flask import Flask
 from flask_bcrypt import Bcrypt
@@ -52,7 +51,7 @@ class TestSecurityProvider(TestCase):
         # Then
         self.mock_bcrypt.generate_password_hash.assert_called_with(password, 12)
 
-    def test_encrypt_to_urlsafetimed_generates_URL_safe_token_with_time_information(self):
+    def test_encrypt_to_urlsafetimed_serializes_data_to_URL_safe_token_with_time_information(self):
         # Given
         data = 'datatosecure'
         salt = 'mysalt'
@@ -63,3 +62,15 @@ class TestSecurityProvider(TestCase):
         
         # Then
         self.mock_urlsafetimed_serializer.dumps.assert_called_with(data, salt=salt)
+
+    def test_decrypt_from_urlsafetimed_deserializes_token_to_data(self):
+        # Given
+        token = 'tokentodeserialize'
+        salt = 'mysalt'
+        self.provider.urlsafetimed_serializer = self.mock_urlsafetimed_serializer
+    
+        # When
+        self.provider.decrypt_from_urlsafetimed(token, salt=salt)
+    
+        # Then
+        self.mock_urlsafetimed_serializer.loads.assert_called_with(token, salt=salt)

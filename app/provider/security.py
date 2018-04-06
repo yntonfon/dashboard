@@ -22,9 +22,12 @@ class SecurityProvider:
     
     def encrypt_password(self, password):
         return self.bcrypt.generate_password_hash(password, self.app.config['BCRYPT_LOG_ROUNDS'])
-    
-    def encrypt_to_urlsafetimed(self, token, salt):
-        return self.urlsafetimed_serializer.dumps(token, salt=salt)
+
+    def encrypt_to_urlsafetimed(self, data, salt):
+        return self.urlsafetimed_serializer.dumps(data, salt=salt)
+
+    def decrypt_from_urlsafetimed(self, token, salt):
+        return self.urlsafetimed_serializer.loads(token, salt=salt)
 
 
 security_provider = SecurityProvider(bcrypt_instance, URLSafeTimedSerializer)
