@@ -59,7 +59,7 @@ class TestUserListAPI(BaseTest):
         self.assertEqual(False, actual_user.email_confirmed)
         self.assertIsNotNone(actual_user.password_hash)
     
-    def test_post_sends_an_email_to_the_new_created_user(self):
+    def test_post_sends_an_email_with_confirmation_link_to_the_new_created_user(self):
         # Given
         user = json.dumps({
             'username': 'thomas',
