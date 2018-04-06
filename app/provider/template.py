@@ -1,6 +1,10 @@
+from enum import Enum
+
 from flask import render_template as render_template
 
-EMAIL_ACTIVATE_TEMPLATE = 'email/activate.html'
+
+class TemplateEnum(Enum):
+    email_activate = 'email/activate.html'
 
 
 class TemplateProvider:
