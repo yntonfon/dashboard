@@ -1,3 +1,4 @@
+from app.exception import UserNotFoundException
 from app.extension import sqlalchemy
 from app.model import User
 
@@ -15,7 +16,10 @@ class UserRepository:
 
     @staticmethod
     def get_by(**kwargs):
-        return User.query.filter_by(**kwargs).first()
+        user = User.query.filter_by(**kwargs).first()
+        if not user:
+            raise UserNotFoundException()
+        return user
 
 
 user_repository = UserRepository

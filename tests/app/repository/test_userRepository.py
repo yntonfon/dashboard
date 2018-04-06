@@ -1,3 +1,4 @@
+from app.exception import UserNotFoundException
 from app.model import User
 from app.repository import user_repository
 from tests.base_test import BaseTest
@@ -13,3 +14,8 @@ class TestUserRepository(BaseTest):
         
         # Then
         self.assertEqual(1, actual)
+
+    def test_get_by_raises_when_user_do_not_exist(self):
+        # When
+        with self.assertRaises(UserNotFoundException):
+            user_repository.get_by()
