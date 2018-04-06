@@ -1,9 +1,9 @@
 from flask import url_for
 
+USER_CONFIRM_EMAIL_API = 'user.user_confirm'
+
 
 class UrlProvider:
-    USER_CONFIRM_EMAIL_API = 'user.user_confirm'
-    
     def __init__(self, url_for):
         self.url_for = url_for
     

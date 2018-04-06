@@ -24,7 +24,7 @@ class TestMailController(TestCase):
         self.controller.send_confirmation_email_link(self.email)
         
         # Then
-        self.security_provider.encrypt_to_urlsafetimed.assert_called_with(self.email, salt='email-confirmation-link')
+        self.security_provider.encrypt_to_urlsafetimed.assert_called_with(self.email, salt='email-confirmation-salt')
     
     def test_send_confirmation_email_link_generates_confirmation_url_with_the_token(self):
         # Given
@@ -35,9 +35,7 @@ class TestMailController(TestCase):
         self.controller.send_confirmation_email_link(self.email)
         
         # Then
-        self.url_provider.build_url_from.assert_called_with(UrlProvider.USER_CONFIRM_EMAIL_API,
-                                                            external=True,
-                                                            token=token)
+        self.url_provider.build_url_from.assert_called_with('user.user_confirm', external=True, token=token)
     
     def test_send_confirmation_email_link_generates_email_template_containing_url(self):
         # Given
