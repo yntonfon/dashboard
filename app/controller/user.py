@@ -1,9 +1,9 @@
 from sqlalchemy.exc import IntegrityError
 
-from app.exception.user import UserAlreadyExistException
-from app.mashaller import user_marshaller
-from app.provider import security_provider
-from app.repository import user_repository
+from app.exception import UserAlreadyExistException
+from app.mashaller import user_marshaller as user_marshaller_instance
+from app.provider import security_provider as security_provider_instance
+from app.repository import user_repository as user_repository_instance
 
 
 class UserController:
@@ -26,4 +26,4 @@ class UserController:
             return {'id': user_id}
 
 
-user_controller = UserController(user_repository, user_marshaller, security_provider)
+user_controller = UserController(user_repository_instance, user_marshaller_instance, security_provider_instance)
