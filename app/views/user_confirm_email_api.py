@@ -1,6 +1,6 @@
 from flask.views import MethodView
 
 
-class UserConfirmationEmailAPI(MethodView):
+class UserConfirmEmailAPI(MethodView):
     def get(self):
         pass
