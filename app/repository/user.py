@@ -13,5 +13,9 @@ class UserRepository:
         sqlalchemy.session.commit()
         return user.id
 
+    @staticmethod
+    def get_by(**kwargs):
+        return User.query.filter_by(**kwargs).first()
+
 
 user_repository = UserRepository
