@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from app.controller.user import UserController
 from app.exception.user import UserAlreadyExistException
 from app.mashaller.user import UserMarshaller
-from app.provider.security import Security
+from app.provider.security import SecurityProvider
 from app.repository.user import UserRepository
 
 
@@ -14,8 +14,8 @@ class TestUserController(TestCase):
     def setUp(self):
         self.user_repository = mock.create_autospec(UserRepository)
         self.user_marshaller = mock.create_autospec(UserMarshaller)
-        self.security = mock.create_autospec(Security)
-        self.controller = UserController(self.user_repository, self.user_marshaller, self.security)
+        self.security_provider = mock.create_autospec(SecurityProvider)
+        self.controller = UserController(self.user_repository, self.user_marshaller, self.security_provider)
         self.payload = {'username': 'pablo', 'email': 'pablo@test.com', 'password': 'rawpassword'}
     
     def test_get_users_returns_all_user_list(self):
@@ -40,7 +40,7 @@ class TestUserController(TestCase):
         user = Mock()
         hashed_password = 'myhashpassword'
         self.user_marshaller.deserialize.return_value = user
-        self.security.encrypt_password.return_value = hashed_password
+        self.security_provider.encrypt_password.return_value = hashed_password
         
         # When
         self.controller.create_user(self.payload)

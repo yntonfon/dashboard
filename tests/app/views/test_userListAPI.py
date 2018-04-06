@@ -59,6 +59,23 @@ class TestUserListAPI(BaseTest):
         self.assertEqual(False, actual_user.email_confirmed)
         self.assertIsNotNone(actual_user.password_hash)
     
+    def test_post_sends_an_email_with_confirmation_link_to_the_new_created_user(self):
+        # Given
+        user = json.dumps({
+            'username': 'thomas',
+            'email': 'thomas@test.com',
+            'password': 'gaspard'
+        })
+        
+        # When
+        with self.mail.record_messages() as outbox:
+            response = self.client.post('/api/users', data=user, headers={'content-type': 'application/json'})
+        
+        # Then
+        self.assert200(response)
+        self.assertEqual(1, len(outbox))
+        self.assertIn('thomas@test.com', outbox[0].recipients)
+        
     def test_post_returns_400_when_user_informations_are_invalid(self):
         # Given
         user = json.dumps({

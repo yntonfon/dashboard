@@ -1,13 +1,11 @@
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 from flask.views import MethodView
 from marshmallow import ValidationError
 
-from app.controller import user_controller
+from app.controller import user_controller, mail_controller
 from app.exception import ViewsException, UserAlreadyExistException
 from app.mashaller import user_marshaller
 from app.validator import user_validator
-
-user_blueprint = Blueprint('user', __name__)
 
 
 class UserListAPI(MethodView):
@@ -25,5 +23,6 @@ class UserListAPI(MethodView):
             raise ViewsException(status_code=400, payload=e.messages)
         except UserAlreadyExistException as e:
             raise ViewsException(status_code=422, payload=e.messages)
-        
-        return jsonify(data)
+        else:
+            mail_controller.send_confirmation_email_link(payload['email'])
+            return jsonify(data)
