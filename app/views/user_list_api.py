@@ -24,5 +24,5 @@ class UserListAPI(MethodView):
         except UserAlreadyExistException as e:
             raise ViewsException(status_code=422, payload=e.messages)
         else:
-            mail_controller.send_confirmation_email(payload['email'])
+            mail_controller.send_confirmation_link(payload['email'])
             return jsonify(data)
