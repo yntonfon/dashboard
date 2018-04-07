@@ -7,9 +7,6 @@ class UrlEnum(Enum):
     user_confirm_email_api = 'user.user_confirm'
 
 
-USER_CONFIRM_EMAIL_API = 'user.user_confirm'
-
-
 class UrlProvider:
     def __init__(self, url_for):
         self.url_for = url_for
