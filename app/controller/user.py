@@ -1,7 +1,7 @@
-from itsdangerous import BadData
 from sqlalchemy.exc import IntegrityError
 
-from app.exception import UserAlreadyExistException, UserInvalidTokenException, UserNotFoundException
+from app.exception import (UserAlreadyExistException, UserInvalidTokenException, UserNotFoundException,
+                           InvalidTokenException)
 from app.mashaller import user_marshaller as user_marshaller_instance
 from app.provider import security_provider as security_provider_instance, SaltEnum
 from app.repository import user_repository as user_repository_instance
@@ -30,7 +30,7 @@ class UserController:
         try:
             email = self.security_provider.decrypt_from_urlsafetimed(token, salt=SaltEnum.email_confirmation.value)
             user = self.user_repository.get_by(email=email)
-        except (BadData, UserNotFoundException):
+        except (InvalidTokenException, UserNotFoundException):
             raise UserInvalidTokenException()
         else:
             user.email_confirmed = True

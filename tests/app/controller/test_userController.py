@@ -1,11 +1,11 @@
 from unittest import TestCase, mock
 from unittest.mock import Mock
 
-from itsdangerous import BadData
 from sqlalchemy.exc import IntegrityError
 
 from app.controller.user import UserController
-from app.exception import UserAlreadyExistException, UserInvalidTokenException, UserNotFoundException
+from app.exception import (UserAlreadyExistException, UserInvalidTokenException, UserNotFoundException,
+                           InvalidTokenException)
 from app.mashaller.user import UserMarshaller
 from app.provider.security import SecurityProvider
 from app.repository.user import UserRepository
@@ -138,7 +138,7 @@ class TestUserController(TestCase):
     def test_confirm_email_raises_when_token_is_invalid(self):
         # Given
         token = 'token'
-        self.security_provider.decrypt_from_urlsafetimed.side_effect = BadData('')
+        self.security_provider.decrypt_from_urlsafetimed.side_effect = InvalidTokenException()
     
         expected = {
             'error_code': 'user-invalid-token',
