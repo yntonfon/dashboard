@@ -1,7 +1,8 @@
 from enum import Enum
 
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, BadData
 
+from app.exception import InvalidTokenException
 from app.extension import bcrypt as bcrypt_instance
 
 
@@ -27,7 +28,11 @@ class SecurityProvider:
         return self.urlsafetimed_serializer.dumps(data, salt=salt)
 
     def decrypt_from_urlsafetimed(self, token, salt):
-        return self.urlsafetimed_serializer.loads(token, salt=salt, max_age=self.app.config['URL_SAFE_TIMED_MAX_AGE'])
+        try:
+            return self.urlsafetimed_serializer.loads(token, salt=salt,
+                                                      max_age=self.app.config['URL_SAFE_TIMED_MAX_AGE'])
+        except BadData:
+            raise InvalidTokenException()
 
 
 security_provider = SecurityProvider(bcrypt_instance, URLSafeTimedSerializer)

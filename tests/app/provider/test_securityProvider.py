@@ -2,8 +2,9 @@ from unittest import TestCase, mock
 
 from flask import Flask
 from flask_bcrypt import Bcrypt
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, BadData
 
+from app.exception import InvalidTokenException
 from app.provider.security import SecurityProvider
 
 
@@ -75,3 +76,15 @@ class TestSecurityProvider(TestCase):
     
         # Then
         self.mock_urlsafetimed_serializer.loads.assert_called_with(token, salt=salt, max_age=1)
+
+    def test_decrypt_from_urlsafetimed_raises_when_token_is_invalid(self):
+        # Given
+        token = 'tokentodeserialize'
+        salt = 'mysalt'
+        self.mock_urlsafetimed_serializer.loads.side_effect = BadData('')
+        self.provider.app = self.mock_app
+        self.provider.urlsafetimed_serializer = self.mock_urlsafetimed_serializer
+    
+        # When
+        with self.assertRaises(InvalidTokenException):
+            self.provider.decrypt_from_urlsafetimed(token, salt=salt)
