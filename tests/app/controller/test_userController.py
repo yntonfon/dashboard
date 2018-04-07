@@ -4,7 +4,8 @@ from unittest.mock import Mock
 from sqlalchemy.exc import IntegrityError
 
 from app.controller.user import UserController
-from app.exception.user import UserAlreadyExistException
+from app.exception import (UserAlreadyExistException, UserInvalidTokenException, UserNotFoundException,
+                           InvalidTokenException)
 from app.mashaller.user import UserMarshaller
 from app.provider.security import SecurityProvider
 from app.repository.user import UserRepository
@@ -16,6 +17,7 @@ class TestUserController(TestCase):
         self.user_marshaller = mock.create_autospec(UserMarshaller)
         self.security_provider = mock.create_autospec(SecurityProvider)
         self.controller = UserController(self.user_repository, self.user_marshaller, self.security_provider)
+        
         self.payload = {'username': 'pablo', 'email': 'pablo@test.com', 'password': 'rawpassword'}
     
     def test_get_users_returns_all_user_list(self):
@@ -78,11 +80,91 @@ class TestUserController(TestCase):
         
         expected = {
             'error_code': 'user-already-exist',
-            'description': 'The user seems to be already created. Choose another username or email'
+            'description': 'The user seems to be already created. Choose another username or email.'
         }
         
         # When
         with self.assertRaises(UserAlreadyExistException) as error:
             self.controller.create_user(self.payload)
         
+        self.assertEqual(expected, error.exception.messages)
+
+    def test_confirm_email_deserializes_given_token_with_appropriate_salt_and_max_age(self):
+        # Given
+        token = 'token'
+    
+        # When
+        self.controller.confirm_email(token)
+    
+        # Then
+        self.security_provider.decrypt_from_urlsafetimed.assert_called_with(token, salt='email-confirmation-salt')
+
+    def test_confirm_email_fetchs_user_by_email(self):
+        # Given
+        token = 'token'
+        email = 'myemail'
+        self.security_provider.decrypt_from_urlsafetimed.return_value = email
+    
+        # When
+        self.controller.confirm_email(token)
+    
+        # Then
+        self.user_repository.get_by.assert_called_with(email=email)
+
+    def test_confirm_email_sets_user_email_confirmed_field_to_true(self):
+        # Given
+        token = 'token'
+        user = Mock()
+        self.user_repository.get_by.return_value = user
+    
+        # When
+        self.controller.confirm_email(token)
+    
+        # Then
+        self.assertEqual(True, user.email_confirmed)
+
+    def test_confirm_email_saves_user_modification(self):
+        # Given
+        token = 'token'
+        user = Mock()
+        self.user_repository.get_by.return_value = user
+    
+        # When
+        self.controller.confirm_email(token)
+    
+        # Then
+        self.user_repository.save.assert_called_with(user)
+
+    def test_confirm_email_raises_when_token_is_invalid(self):
+        # Given
+        token = 'token'
+        self.security_provider.decrypt_from_urlsafetimed.side_effect = InvalidTokenException()
+    
+        expected = {
+            'error_code': 'user-invalid-token',
+            'description': 'The token seems to be incorrect. Please request a fresh one.'
+        }
+    
+        # When
+        with self.assertRaises(UserInvalidTokenException) as error:
+            self.controller.confirm_email(token)
+    
+        # Then
+        self.assertEqual(expected, error.exception.messages)
+
+    def test_confirm_email_raises_when_user_is_not_found(self):
+        # Given
+        token = 'token'
+        self.user_repository.get_by.side_effect = UserNotFoundException()
+    
+        expected = {
+            'error_code': 'user-invalid-token',
+            'description': 'The token seems to be incorrect. Please request a fresh one.'
+        }
+    
+        # When
+        with self.assertRaises(UserInvalidTokenException) as error:
+            self.controller.confirm_email(token)
+    
+        # Then
         self.assertEqual(expected, error.exception.messages)

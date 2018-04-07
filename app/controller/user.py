@@ -1,9 +1,10 @@
 from sqlalchemy.exc import IntegrityError
 
-from app.exception.user import UserAlreadyExistException
-from app.mashaller import user_marshaller
-from app.provider import security_provider
-from app.repository import user_repository
+from app.exception import (UserAlreadyExistException, UserInvalidTokenException, UserNotFoundException,
+                           InvalidTokenException)
+from app.mashaller import user_marshaller as user_marshaller_instance
+from app.provider import security_provider as security_provider_instance, SaltEnum
+from app.repository import user_repository as user_repository_instance
 
 
 class UserController:
@@ -11,7 +12,7 @@ class UserController:
         self.user_repository = user_repository
         self.user_marshaller = user_marshaller
         self.security_provider = security_provider
-    
+
     def get_users(self):
         return self.user_repository.get_all()
     
@@ -25,5 +26,17 @@ class UserController:
         else:
             return {'id': user_id}
 
+    def confirm_email(self, token):
+        try:
+            email = self.security_provider.decrypt_from_urlsafetimed(token, salt=SaltEnum.email_confirmation.value)
+            user = self.user_repository.get_by(email=email)
+        except (InvalidTokenException, UserNotFoundException):
+            raise UserInvalidTokenException()
+        else:
+            user.email_confirmed = True
+            return self.user_repository.save(user)
 
-user_controller = UserController(user_repository, user_marshaller, security_provider)
+
+user_controller = UserController(user_repository_instance,
+                                 user_marshaller_instance,
+                                 security_provider_instance)

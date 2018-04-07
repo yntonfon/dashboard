@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from app.extension import mail
+from app.extension import mail as mail_instance
 
 MsgTemplate = namedtuple('MsgTemplate', ['subject', 'recipients', 'html'])
 
@@ -13,4 +13,4 @@ class MailProvider:
         return self.mail.send_message(subject=msg.subject, html=msg.html, recipients=msg.recipients)
 
 
-mail_provider = MailProvider(mail)
+mail_provider = MailProvider(mail_instance)

@@ -1,4 +1,4 @@
-from app.schema import user_schema
+from app.schema import user_schema as user_schema_instance
 
 
 class UserMarshaller:
@@ -16,4 +16,4 @@ class UserMarshaller:
         return self.serialize(users, many=True)
 
 
-user_marshaller = UserMarshaller(user_schema)
+user_marshaller = UserMarshaller(user_schema_instance)
