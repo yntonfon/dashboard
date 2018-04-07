@@ -168,3 +168,13 @@ class TestUserController(TestCase):
     
         # Then
         self.assertEqual(expected, error.exception.messages)
+
+    def test_get_user_fetchs_user_from_repository(self):
+        # Given
+        email = 'foo@test.com'
+    
+        # When
+        self.controller.get_user(email)
+    
+        # Then
+        self.user_repository.get_by.assert_called_with(email=email)

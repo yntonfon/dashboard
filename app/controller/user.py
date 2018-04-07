@@ -15,6 +15,9 @@ class UserController:
 
     def get_users(self):
         return self.user_repository.get_all()
+
+    def get_user(self, email):
+        return self.user_repository.get_by(email=email)
     
     def create_user(self, payload):
         user = self.user_marshaller.deserialize(payload)
