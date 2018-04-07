@@ -3,7 +3,7 @@ from tests.base_test import BaseTest
 
 
 class TestUserResetPasswordAPI(BaseTest):
-    def test_post_resets_the_user_password_and_send_him_an_email(self):
+    def test_put_resets_the_user_password_and_send_him_an_email(self):
         # Given
         user = User(username='Robert', email='robert@test.com', password_hash='secrethashed')
         self.db.session.add(user)

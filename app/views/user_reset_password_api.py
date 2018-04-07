@@ -2,5 +2,5 @@ from flask.views import MethodView
 
 
 class UserResetPasswordAPI(MethodView):
-    def post(self):
+    def put(self):
         pass
