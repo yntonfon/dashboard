@@ -19,8 +19,8 @@ class TestUserConfirmEmailAPI(BaseTest):
         self.assertStatus(response, 201)
         actual_user = User.query.first()
         self.assertTrue(actual_user.email_confirmed)
-    
-    def test_get_returns_412_precondition_failed_when_token_is_invalid(self):
+
+    def test_get_returns_412_precondition_failed_when_user_send_an_invalid_token(self):
         # Given
         user_1 = User(username='user1', email='user1@test.com', password_hash='hash')
         self.db.session.add(user_1)
