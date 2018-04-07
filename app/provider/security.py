@@ -8,6 +8,7 @@ from app.extension import bcrypt as bcrypt_instance
 
 class SaltEnum(Enum):
     email_confirmation = 'email-confirmation-salt'
+    reset_password = 'reset-password-salt'
 
 
 class SecurityProvider:

@@ -5,6 +5,7 @@ from flask import url_for
 
 class UrlEnum(Enum):
     user_confirm_email_api = 'user.user_confirm'
+    user_reset_password_api = 'user.user_reset'
 
 
 class UrlProvider:

@@ -21,7 +21,12 @@ class MailController:
         return self.mail_provider.send(msg)
 
     def send_reset_password_link(self, email):
-        pass
+        token = self.security_provider.encrypt_to_urlsafetimed(email, salt=SaltEnum.reset_password.value)
+        url = self.url_provider.create_url_for(UrlEnum.user_reset_password_api.value, external=True, token=token)
+        body = self.template_provider.render_template(TemplateEnum.reset_password.value, reset_url=url)
+    
+        msg = MsgTemplate('Password reset requested', html=body, recipients=[email])
+        return self.mail_provider.send(msg)
 
 
 mail_controller = MailController(security_provider_instance,
