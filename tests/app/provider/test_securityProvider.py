@@ -13,8 +13,8 @@ class TestSecurityProvider(TestCase):
         self.mock_app = mock.create_autospec(Flask)
         self.mock_urlsafetimed_serializer = mock.create_autospec(URLSafeTimedSerializer)
         self.provider = SecurityProvider(self.mock_bcrypt, self.mock_urlsafetimed_serializer)
-        
-        self.mock_app.config = {'SECRET_KEY': 'mysecret', 'BCRYPT_LOG_ROUNDS': 12}
+
+        self.mock_app.config = {'SECRET_KEY': 'mysecret', 'BCRYPT_LOG_ROUNDS': 12, 'URL_SAFE_TIMED_MAX_AGE': 1}
         
     def test_init_app_sets_app(self):
         # When
@@ -22,8 +22,8 @@ class TestSecurityProvider(TestCase):
         
         # Then
         self.assertEqual(self.mock_app, self.provider.app)
-        
-    def test_init_app_instanciates_new_urlsafetimed_serializer(self):
+
+    def test_init_app_instanciates_new_uURL_SAFE_TIMED_MAX_AGErlsafetimed_serializer(self):
         # When
         self.provider.init_app(self.mock_app)
         
@@ -67,11 +67,11 @@ class TestSecurityProvider(TestCase):
         # Given
         token = 'tokentodeserialize'
         salt = 'mysalt'
-        max_age = 12
+        self.provider.app = self.mock_app
         self.provider.urlsafetimed_serializer = self.mock_urlsafetimed_serializer
     
         # When
-        self.provider.decrypt_from_urlsafetimed(token, salt=salt, max_age=max_age)
+        self.provider.decrypt_from_urlsafetimed(token, salt=salt)
     
         # Then
-        self.mock_urlsafetimed_serializer.loads.assert_called_with(token, salt=salt, max_age=max_age)
+        self.mock_urlsafetimed_serializer.loads.assert_called_with(token, salt=salt, max_age=1)

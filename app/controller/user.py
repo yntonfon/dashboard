@@ -32,8 +32,7 @@ class UserController:
 
     def confirm_email(self, token):
         try:
-            email = self.security_provider.decrypt_from_urlsafetimed(token, salt=SaltEnum.email_confirmation.value,
-                                                                     max_age=self.app.config['URL_SAFE_TIMED_MAX_AGE'])
+            email = self.security_provider.decrypt_from_urlsafetimed(token, salt=SaltEnum.email_confirmation.value)
             user = self.user_repository.get_by(email=email)
         except (BadData, UserNotFoundException):
             raise UserInvalidTokenException()

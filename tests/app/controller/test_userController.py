@@ -111,9 +111,7 @@ class TestUserController(TestCase):
         self.controller.confirm_email(token)
     
         # Then
-        self.security_provider.decrypt_from_urlsafetimed.assert_called_with(token,
-                                                                            salt='email-confirmation-salt',
-                                                                            max_age=5)
+        self.security_provider.decrypt_from_urlsafetimed.assert_called_with(token, salt='email-confirmation-salt')
 
     def test_confirm_email_fetchs_user_by_email(self):
         # Given
