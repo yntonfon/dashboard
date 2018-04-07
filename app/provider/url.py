@@ -10,8 +10,8 @@ class UrlEnum(Enum):
 class UrlProvider:
     def __init__(self, url_for):
         self.url_for = url_for
-    
-    def build_url_from(self, api, external, **kwargs):
+
+    def create_url_for(self, api, external, **kwargs):
         return self.url_for(api, _external=external, **kwargs)
 
 

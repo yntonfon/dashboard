@@ -14,7 +14,7 @@ class MailController:
 
     def send_confirmation_link(self, email):
         token = self.security_provider.encrypt_to_urlsafetimed(email, salt=SaltEnum.email_confirmation.value)
-        url = self.url_provider.build_url_from(UrlEnum.user_confirm_email_api.value, external=True, token=token)
+        url = self.url_provider.create_url_for(UrlEnum.user_confirm_email_api.value, external=True, token=token)
         body = self.template_provider.render_template(TemplateEnum.email_activate.value, confirm_url=url)
         
         msg = MsgTemplate('Confirm your email', html=body, recipients=[email])
