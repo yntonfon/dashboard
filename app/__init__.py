@@ -32,8 +32,4 @@ def create_app(config_object=None):
     from app.provider import security_provider
     security_provider.init_app(app)
 
-    # Register Controller
-    from app.controller import user_controller
-    user_controller.init_app(app)
-
     return app

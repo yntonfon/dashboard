@@ -17,22 +17,8 @@ class TestUserController(TestCase):
         self.user_marshaller = mock.create_autospec(UserMarshaller)
         self.security_provider = mock.create_autospec(SecurityProvider)
         self.controller = UserController(self.user_repository, self.user_marshaller, self.security_provider)
-
-        self.app = Mock()
-        self.app.config = {'URL_SAFE_TIMED_MAX_AGE': 5}
-        self.controller.app = self.app
         
         self.payload = {'username': 'pablo', 'email': 'pablo@test.com', 'password': 'rawpassword'}
-
-    def test_init_app_sets_app(self):
-        # Given
-        app = 'myapp'
-    
-        # When
-        self.controller.init_app(app)
-    
-        # Then
-        self.assertEqual(app, self.controller.app)
     
     def test_get_users_returns_all_user_list(self):
         # Given
