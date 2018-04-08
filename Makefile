@@ -8,3 +8,8 @@ start-local-mail-server:
 install:
 	pip install -r dev-requirements.txt
 	pip install -r requirements.txt
+
+coverage:
+	coverage run --branch --source app/ -m unittest -q
+	coverage html --title="Dashboard coverage report"
+	coverage report -m
