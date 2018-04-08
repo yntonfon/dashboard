@@ -15,7 +15,7 @@ class TestUrlProvider(TestCase):
         provider = UrlProvider(mock_url_for)
         
         # When
-        actual = provider.build_url_from(api, external_link, token=token)
+        provider.create_url_for(api, external_link, token=token)
         
         # Then
         mock_url_for.assert_called_with('myAPI', _external=True, token=token)
@@ -30,7 +30,7 @@ class TestUrlProvider(TestCase):
         provider = UrlProvider(mock_url_for)
         
         # When
-        actual = provider.build_url_from(api, external_link, token=token)
+        actual = provider.create_url_for(api, external_link, token=token)
         
         # Then
         self.assertEqual('newurl', actual)

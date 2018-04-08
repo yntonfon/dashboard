@@ -5,6 +5,8 @@ from flask import render_template as render_template
 
 class TemplateEnum(Enum):
     email_activate = 'email/activate.html'
+    reset_password = 'email/reset_password.html'
+    new_password = 'email/new_password.html'
 
 
 class TemplateProvider:

@@ -4,8 +4,9 @@ from unittest.mock import Mock
 from sqlalchemy.exc import IntegrityError
 
 from app.controller.user import UserController
+from app.domain import UserDomain
 from app.exception import (UserAlreadyExistException, UserInvalidTokenException, UserNotFoundException,
-                           InvalidTokenException)
+                           InvalidTokenException, UserNotActiveException)
 from app.mashaller.user import UserMarshaller
 from app.provider.security import SecurityProvider
 from app.repository.user import UserRepository
@@ -16,7 +17,9 @@ class TestUserController(TestCase):
         self.user_repository = mock.create_autospec(UserRepository)
         self.user_marshaller = mock.create_autospec(UserMarshaller)
         self.security_provider = mock.create_autospec(SecurityProvider)
-        self.controller = UserController(self.user_repository, self.user_marshaller, self.security_provider)
+        self.user_domain = mock.create_autospec(UserDomain)
+        self.controller = UserController(self.user_repository, self.user_marshaller, self.security_provider,
+                                         self.user_domain)
         
         self.payload = {'username': 'pablo', 'email': 'pablo@test.com', 'password': 'rawpassword'}
     
@@ -92,10 +95,10 @@ class TestUserController(TestCase):
     def test_confirm_email_deserializes_given_token_with_appropriate_salt_and_max_age(self):
         # Given
         token = 'token'
-    
+
         # When
         self.controller.confirm_email(token)
-    
+
         # Then
         self.security_provider.decrypt_from_urlsafetimed.assert_called_with(token, salt='email-confirmation-salt')
 
@@ -104,10 +107,10 @@ class TestUserController(TestCase):
         token = 'token'
         email = 'myemail'
         self.security_provider.decrypt_from_urlsafetimed.return_value = email
-    
+
         # When
         self.controller.confirm_email(token)
-    
+
         # Then
         self.user_repository.get_by.assert_called_with(email=email)
 
@@ -116,10 +119,10 @@ class TestUserController(TestCase):
         token = 'token'
         user = Mock()
         self.user_repository.get_by.return_value = user
-    
+
         # When
         self.controller.confirm_email(token)
-    
+
         # Then
         self.assertEqual(True, user.email_confirmed)
 
@@ -128,14 +131,160 @@ class TestUserController(TestCase):
         token = 'token'
         user = Mock()
         self.user_repository.get_by.return_value = user
-    
+
         # When
         self.controller.confirm_email(token)
-    
+
         # Then
         self.user_repository.save.assert_called_with(user)
 
     def test_confirm_email_raises_when_token_is_invalid(self):
+        # Given
+        token = 'token'
+        self.security_provider.decrypt_from_urlsafetimed.side_effect = InvalidTokenException()
+
+        expected = {
+            'error_code': 'user-invalid-token',
+            'description': 'The token seems to be incorrect. Please request a fresh one.'
+        }
+
+        # When
+        with self.assertRaises(UserInvalidTokenException) as error:
+            self.controller.confirm_email(token)
+
+        # Then
+        self.assertEqual(expected, error.exception.messages)
+
+    def test_confirm_email_raises_when_user_is_not_found(self):
+        # Given
+        token = 'token'
+        self.user_repository.get_by.side_effect = UserNotFoundException()
+
+        expected = {
+            'error_code': 'user-invalid-token',
+            'description': 'The token seems to be incorrect. Please request a fresh one.'
+        }
+
+        # When
+        with self.assertRaises(UserInvalidTokenException) as error:
+            self.controller.confirm_email(token)
+
+        # Then
+        self.assertEqual(expected, error.exception.messages)
+
+    def test_get_user_fetchs_user_from_repository(self):
+        # Given
+        email = 'foo@test.com'
+
+        # When
+        self.controller.get_user(email)
+
+        # Then
+        self.user_repository.get_by.assert_called_with(email=email)
+
+    def test_validate_user_status_raises_when_email_is_not_confirmed(self):
+        # Given
+        user = 'user'
+        self.user_domain.is_active.return_value = False
+    
+        expected = {
+            'error_code': 'user-not-active',
+            'description': 'Your email is not confirmed. Please consider to confirm your email first'
+        }
+    
+        # When
+        with self.assertRaises(UserNotActiveException) as error:
+            self.controller.validate_user_status(user)
+    
+        self.assertEqual(expected, error.exception.messages)
+
+    def test_reset_password_deserializes_urlsafetimed_token(self):
+        # Given
+        token = 'token'
+    
+        # When
+        self.controller.reset_password(token)
+    
+        # Then
+        self.security_provider.decrypt_from_urlsafetimed.assert_called_with(token, salt='reset-password-salt')
+
+    def test_reset_password_fetchs_user_by_the_email_containing_in_the_token(self):
+        # Given
+        token = 'token'
+        email = 'email'
+        self.security_provider.decrypt_from_urlsafetimed.return_value = 'email'
+    
+        # When
+        self.controller.reset_password(token)
+    
+        # Then
+        self.user_repository.get_by.assert_called_with(email=email)
+
+    def test_reset_password_generates_a_brand_new_password(self):
+        # Given
+        token = 'token'
+    
+        # When
+        self.controller.reset_password(token)
+    
+        # Then
+        self.security_provider.generate_password.assert_called_with()
+
+    def test_reset_password_hashes_the_new_password(self):
+        # Given
+        token = 'token'
+        rawpassword = 'rawpassword'
+        self.security_provider.generate_password.return_value = rawpassword
+    
+        # When
+        self.controller.reset_password(token)
+    
+        # Then
+        self.security_provider.encrypt_password.assert_called_with(rawpassword)
+
+    def test_reset_password_sets_new_encrypted_password_to_user(self):
+        # Given
+        token = 'token'
+        user = Mock()
+        encryptedpassword = 'encryptedpassword'
+        self.user_repository.get_by.return_value = user
+        self.security_provider.encrypt_password.return_value = encryptedpassword
+    
+        # When
+        self.controller.reset_password(token)
+    
+        # Then
+        self.assertEqual(encryptedpassword, user.password_hash)
+
+    def test_reset_password_saves_modification_on_user(self):
+        # Given
+        token = 'token'
+        user = Mock()
+        self.user_repository.get_by.return_value = user
+    
+        # When
+        self.controller.reset_password(token)
+    
+        # Then
+        self.user_repository.save.assert_called_with(user)
+
+    def test_reset_password_returns_email_and_then_new_password_non_encrypted(self):
+        # Given
+        token = 'token'
+        email = 'email'
+        rawpassword = 'rawpassword'
+        self.security_provider.decrypt_from_urlsafetimed.return_value = email
+        self.security_provider.generate_password.return_value = rawpassword
+    
+        expected = {'email': email, 'password': rawpassword}
+    
+        # When
+        actual = self.controller.reset_password(token)
+    
+        # Then
+        self.assertEqual(expected, actual)
+
+    def test_reset_password_raises_when_token_is_invalid(self):
         # Given
         token = 'token'
         self.security_provider.decrypt_from_urlsafetimed.side_effect = InvalidTokenException()
@@ -147,12 +296,12 @@ class TestUserController(TestCase):
     
         # When
         with self.assertRaises(UserInvalidTokenException) as error:
-            self.controller.confirm_email(token)
+            self.controller.reset_password(token)
     
         # Then
         self.assertEqual(expected, error.exception.messages)
 
-    def test_confirm_email_raises_when_user_is_not_found(self):
+    def test_reset_password_raises_when_user_is_not_found(self):
         # Given
         token = 'token'
         self.user_repository.get_by.side_effect = UserNotFoundException()
@@ -164,7 +313,7 @@ class TestUserController(TestCase):
     
         # When
         with self.assertRaises(UserInvalidTokenException) as error:
-            self.controller.confirm_email(token)
+            self.controller.reset_password(token)
     
         # Then
         self.assertEqual(expected, error.exception.messages)

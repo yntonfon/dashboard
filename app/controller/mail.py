@@ -11,13 +11,27 @@ class MailController:
         self.template_provider = template_provider
         self.url_provider = url_provider
         self.security_provider = security_provider
-    
-    def send_confirmation_email(self, email):
+
+    def send_confirmation_link(self, email):
         token = self.security_provider.encrypt_to_urlsafetimed(email, salt=SaltEnum.email_confirmation.value)
-        url = self.url_provider.build_url_from(UrlEnum.user_confirm_email_api.value, external=True, token=token)
+        url = self.url_provider.create_url_for(UrlEnum.user_confirm_email_api.value, external=True, token=token)
         body = self.template_provider.render_template(TemplateEnum.email_activate.value, confirm_url=url)
         
         msg = MsgTemplate('Confirm your email', html=body, recipients=[email])
+        return self.mail_provider.send(msg)
+
+    def send_reset_password_link(self, email):
+        token = self.security_provider.encrypt_to_urlsafetimed(email, salt=SaltEnum.reset_password.value)
+        url = self.url_provider.create_url_for(UrlEnum.user_reset_password_api.value, external=True, token=token)
+        body = self.template_provider.render_template(TemplateEnum.reset_password.value, reset_url=url)
+    
+        msg = MsgTemplate('Password reset requested', html=body, recipients=[email])
+        return self.mail_provider.send(msg)
+
+    def send_new_password(self, email, password):
+        body = self.template_provider.render_template(TemplateEnum.new_password.value, password=password)
+    
+        msg = MsgTemplate('Your new brand password', html=body, recipients=[email])
         return self.mail_provider.send(msg)
 
 

@@ -14,5 +14,13 @@ class UserInvalidTokenException(Exception):
         }
 
 
+class UserNotActiveException(Exception):
+    def __init__(self):
+        self.messages = {
+            'error_code': 'user-not-active',
+            'description': 'Your email is not confirmed. Please consider to confirm your email first'
+        }
+
+
 class UserNotFoundException(Exception):
     pass
