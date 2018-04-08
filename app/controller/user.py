@@ -1,14 +1,16 @@
 from sqlalchemy.exc import IntegrityError
 
+from app.domain.user import user_domain as user_domain_instance
 from app.exception import (UserAlreadyExistException, UserInvalidTokenException, UserNotFoundException,
-                           InvalidTokenException)
+                           InvalidTokenException, UserNotActiveException)
 from app.mashaller import user_marshaller as user_marshaller_instance
 from app.provider import security_provider as security_provider_instance, SaltEnum
 from app.repository import user_repository as user_repository_instance
 
 
 class UserController:
-    def __init__(self, user_repository, user_marshaller, security_provider):
+    def __init__(self, user_repository, user_marshaller, security_provider, user_domain):
+        self.user_domain = user_domain
         self.user_repository = user_repository
         self.user_marshaller = user_marshaller
         self.security_provider = security_provider
@@ -38,8 +40,13 @@ class UserController:
         else:
             user.email_confirmed = True
             return self.user_repository.save(user)
+    
+    def validate_user_status(self, user):
+        if not self.user_domain.is_active(user):
+            raise UserNotActiveException()
 
 
 user_controller = UserController(user_repository_instance,
                                  user_marshaller_instance,
-                                 security_provider_instance)
+                                 security_provider_instance,
+                                 user_domain_instance)
