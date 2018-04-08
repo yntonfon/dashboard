@@ -45,6 +45,19 @@ class UserController:
         if not self.user_domain.is_active(user):
             raise UserNotActiveException()
 
+    def reset_password(self, token):
+        try:
+            email = self.security_provider.decrypt_from_urlsafetimed(token, salt=SaltEnum.reset_password.value)
+            user = self.user_repository.get_by(email=email)
+        except (InvalidTokenException, UserNotFoundException):
+            raise UserInvalidTokenException()
+
+        raw_password = self.security_provider.generate_password()
+        user.password_hash = self.security_provider.encrypt_password(raw_password)
+        self.user_repository.save(user)
+
+        return {'email': email, 'password': raw_password}
+
 
 user_controller = UserController(user_repository_instance,
                                  user_marshaller_instance,
