@@ -88,3 +88,10 @@ class TestSecurityProvider(TestCase):
         # When
         with self.assertRaises(InvalidTokenException):
             self.provider.decrypt_from_urlsafetimed(token, salt=salt)
+
+    def test_generate_password_returns_a_new_password(self):
+        # When
+        actual = self.provider.generate_password()
+    
+        # Then
+        self.assertEqual('Password01!', actual)
