@@ -13,3 +13,6 @@ coverage:
 	coverage run --branch --source app/ -m unittest -q
 	coverage html --title="Dashboard coverage report"
 	coverage report -m
+
+cloc:
+	pygount --format=cloc-xml --out cloc.xml --suffix=py app/
