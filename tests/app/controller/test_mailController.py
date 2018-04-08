@@ -110,3 +110,31 @@ class TestMailController(TestCase):
     
         # Then
         self.mail_provider.send.assert_called_with(expected_msg_template)
+
+    def test_send_new_password_creates_email_body_containing_the_new_password(self):
+        # Given
+        password = 'password'
+    
+        # When
+        self.controller.send_new_password(self.email, password)
+    
+        # Then
+        self.template_provider.render_template.assert_called_with('email/new_password.html', password=password)
+
+    def test_send_new_password_sends_email_to_the_given_address(self):
+        # Given
+        password = 'password'
+        body = 'body'
+        self.template_provider.render_template.return_value = body
+    
+        expected_msg_template = MsgTemplate(
+            subject='Your new brand password',
+            html=body,
+            recipients=[self.email]
+        )
+    
+        # When
+        self.controller.send_new_password(self.email, password)
+    
+        # Then
+        self.mail_provider.send.assert_called_with(expected_msg_template)

@@ -28,6 +28,12 @@ class MailController:
         msg = MsgTemplate('Password reset requested', html=body, recipients=[email])
         return self.mail_provider.send(msg)
 
+    def send_new_password(self, email, password):
+        body = self.template_provider.render_template(TemplateEnum.new_password.value, password=password)
+    
+        msg = MsgTemplate('Your new brand password', html=body, recipients=[email])
+        return self.mail_provider.send(msg)
+
 
 mail_controller = MailController(security_provider_instance,
                                  url_provider_instance,
