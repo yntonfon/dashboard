@@ -42,5 +42,8 @@ def bootstrap_app(app=None, config=None):
     # Register Provider
     from app.provider import security_provider
     security_provider.init_app(app)
+
+    # Init logger
+    init_logger(app, app.logger)
     
     return app
