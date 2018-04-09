@@ -2,20 +2,13 @@ from flask import Flask
 
 
 def create_app(config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
     
     # Load the default configuration
-    app.config.from_object('config.default')
-    
-    # Load the configuration from the instance folder
-    app.config.from_pyfile('config.py')
+    app.config.from_object('config.default_settings')
 
     if config:
         app.config.from_object(config)
-    else:
-        # Load the file specified by the APP_CONFIG_FILE environment variable
-        # Variables defined here will override those in the default configuration
-        app.config.from_envvar('APP_CONFIG_FILE')
     
     return app
 
