@@ -16,3 +16,6 @@ coverage:
 
 cloc:
 	pygount --format=cloc-xml --out cloc.xml --suffix=py app/
+
+start-dev-server:
+	FLASK_APP=run.py FLASK_DEBUG=1 flask run
