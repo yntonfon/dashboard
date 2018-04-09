@@ -9,7 +9,14 @@ def get_bool(var, default):
     return bool(os.environ.get(var, default))
 
 
-DEBUG = get_bool('DEBUG', False)
+DEBUG = get_bool('DEBUG', True)
+
+# LOG
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')
+assert LOG_LEVEL in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+LOG_FILE_NAME = os.environ.get('LOG_FILE_NAME', '')
+LOG_FILE_MAX_SIZE = get_int('LOG_FILE_MAX_SIZE', 10 * 1024 * 1024)
+LOG_FILE_BACKUP_COUNT = get_int('LOG_FILE_BACKUP_COUNT', 1)
 
 # API
 API_URL_PREFIX = os.environ.get('API_URL_PREFIX', '/api')
