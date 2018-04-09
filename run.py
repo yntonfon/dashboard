@@ -1,2 +1,3 @@
-from app import create_app
-app = create_app()
+from app import bootstrap_app
+
+app = bootstrap_app()

@@ -1,7 +1,7 @@
 from flask import Flask
 
 
-def create_app(config_object=None):
+def create_app(config=None):
     app = Flask(__name__, instance_relative_config=True)
     
     # Load the default configuration
@@ -9,13 +9,22 @@ def create_app(config_object=None):
     
     # Load the configuration from the instance folder
     app.config.from_pyfile('config.py')
-    
-    if config_object:
-        app.config.from_object(config_object)
+
+    if config:
+        app.config.from_object(config)
     else:
         # Load the file specified by the APP_CONFIG_FILE environment variable
         # Variables defined here will override those in the default configuration
         app.config.from_envvar('APP_CONFIG_FILE')
+    
+    return app
+
+
+def bootstrap_app(app=None, config=None):
+    if not app:
+        app = create_app(config)
+    elif config:
+        app.config.update(config)
     
     # Register Blueprints
     from app.views import user_blueprint
@@ -31,5 +40,5 @@ def create_app(config_object=None):
     # Register Provider
     from app.provider import security_provider
     security_provider.init_app(app)
-
+    
     return app

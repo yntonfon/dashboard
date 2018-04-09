@@ -1,11 +1,11 @@
 from flask_testing import TestCase
 
-from app import create_app
+from app import bootstrap_app
 
 
 class BaseTest(TestCase):
     def create_app(self):
-        app = create_app('config.testing')
+        app = bootstrap_app(config='config.testing')
         self.db = app.extensions['sqlalchemy'].db
         self.mail = app.extensions['mail']
         
