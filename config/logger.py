@@ -16,7 +16,8 @@ def init_logger(app, logger):
         handler = RotatingFileHandler(file_name, maxBytes=max_bytes, backupCount=backup_count)
     except:
         handler = logging.StreamHandler()
-    
-    handler.setFormatter(fmt=FALLBACK_FORMAT)
+
+    formatter = logging.Formatter(FALLBACK_FORMAT)
+    handler.setFormatter(formatter)
     handler.setLevel(level)
     logger.addHandler(handler)
