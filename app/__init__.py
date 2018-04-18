@@ -1,18 +1,20 @@
+import os
+
 from flask import Flask
+
+from config.logger import init_logger
 
 
 def create_app(config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
     
     # Load the default configuration
-    app.config.from_object('config.default')
-    
-    # Load the configuration from the instance folder
-    app.config.from_pyfile('config.py')
+    app.config.from_object('config.default_settings')
 
     if config:
         app.config.from_object(config)
-    else:
+
+    if os.environ.get('APP_CONFIG_FILE'):
         # Load the file specified by the APP_CONFIG_FILE environment variable
         # Variables defined here will override those in the default configuration
         app.config.from_envvar('APP_CONFIG_FILE')
@@ -40,5 +42,8 @@ def bootstrap_app(app=None, config=None):
     # Register Provider
     from app.provider import security_provider
     security_provider.init_app(app)
+
+    # Init logger
+    init_logger(app, app.logger)
     
     return app
